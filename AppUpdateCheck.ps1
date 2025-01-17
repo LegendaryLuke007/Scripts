@@ -1,9 +1,9 @@
 # This Script is for Checking for Updates on Local Software on a Windows PC through Powershell
-# To run, download this script and ./AppUpdateCheck.ps1 in powershell
+# To run, download this script and .\AppUpdateCheck.ps1 in powershell
 
 # Show all possible upgrades to the software on the local computer
 winget upgrade --include-unknown
-gogotag = 'yes'
+$gogotag = 'yes'
 $Checkout = ''
 # Prompting User based on information
 
