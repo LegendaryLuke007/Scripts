@@ -34,7 +34,7 @@ while ($gogotag -eq "yes") #Loop runs continuously as long as the user isn"t fin
             {
               $DoubleConfirmation = Read-Host "Are you sure you want to upgrade?"  #Double check that they want to upgrade
             
-            if ($DoubleConfirmation = -eq "yes") 
+            if ($DoubleConfirmation -eq "yes") 
               {
               
                 winget upgrade --id $ApplicationName #Application is upgraded
