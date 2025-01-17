@@ -28,7 +28,7 @@ while ($gogotag -eq "yes") #Loop runs continuously as long as the user isn"t fin
       
           winget upgrade --include-unknown #Shows full List of applications that are out of date
           $ApplicationName = Read-Host "Which application on the above list are you wanting to upgrade?"
-          $ApplicationExists = winget list --query $ApplicationName #Checking to see if the ApplicationName exists on the list
+          $ApplicationExists = winget list --name $ApplicationName #Checking to see if the ApplicationName exists on the list
           
           if ($ApplicationExists) #Check to see if application referenced actually exists
             {
@@ -37,7 +37,7 @@ while ($gogotag -eq "yes") #Loop runs continuously as long as the user isn"t fin
             if ($DoubleConfirmation -eq "yes") 
               {
               
-                winget upgrade --id $ApplicationName #Application is upgraded
+                winget upgrade --name $ApplicationName #Application is upgraded
                 $Checkout = Read-Host "OK!, $ApplicationName Should be upgraded, do you need to upgrade something else?" #Asks to see if that is all that is needed?
               }
               
