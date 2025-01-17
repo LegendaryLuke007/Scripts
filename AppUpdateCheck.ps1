@@ -8,7 +8,7 @@ $gogotag = "yes"
 $Checkout = ""
 # Prompting User based on information
 
-while (gogotag -eq "yes") #Loop runs continuously as long as the user isn"t finished with upgrading applications.
+while ($gogotag -eq "yes") #Loop runs continuously as long as the user isn"t finished with upgrading applications.
   {
   $UpgradeApplications = Read-Host "Do you want to upgrade ALL of your local applications? (yes/no)"
 
