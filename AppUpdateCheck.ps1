@@ -1,5 +1,7 @@
 # This Script is for Checking for Updates on Local Software on a Windows PC through Powershell
-# To run, download this script and .\AppUpdateCheck.ps1 in powershell
+# To run, download this script and .\AppUpdateCheck.ps1 in PowerShell
+# Make sure that all necessary permissions are turned on. Also, If need be, copying the raw code straight into the terminal 
+# will work as well.
 
 # Show all possible upgrades to the software on the local computer
 winget upgrade --include-unknown
