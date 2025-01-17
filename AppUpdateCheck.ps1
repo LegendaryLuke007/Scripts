@@ -55,4 +55,3 @@ while ($gogotag -eq "yes") #Loop runs continuously as long as the user isn"t fin
     $gogotag = "no" #Turns off while loop and stops the program from running any more times
     }
   }
-  "Great! Have a wonderful Day :)!"
