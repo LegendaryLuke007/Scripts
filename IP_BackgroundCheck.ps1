@@ -12,6 +12,7 @@
 # - IP-API
 # - AlienVault OTX
 
+
 try {
     $config = Get-Content -Path "config.json" | ConvertFrom-Json    
 }
@@ -31,12 +32,11 @@ function Get-APIKey
     }
 }
 
-function GetIPInfo { #This function will take an IP address as input, and return the information from the API sources   
+function GetIPInfo () { #This function will take an IP address as input, and return the information from the API sources   
 
     param (
         [parameter(Mandatory = $true)] #IP is a required parameter
-        [string]$IP
-
+        [string]$IP, #
         [string]$AbuseIDDB, #AbuseIPDB API Key                  
         [string]$IPAPI, #IP-API API Key
         [string]$AlienVaultOTX #AlienVault OTX API Key
@@ -82,7 +82,7 @@ Write-Host "Last Reported: $($response_AbuseIPDB.data.lastReportedAt)"
 
 Write-Host "`nResults from IP-API:" 
 Write-Host "-------------------"
-Write-Host "Country: $($response_IPAPI.country)"
+Write-Host "Country: $($response_IPAPI.country)" 
 Write-Host "Region: $($response_IPAPI.regionName)"
 Write-Host "City: $($response_IPAPI.city)"
 Write-Host "ISP: $($response_IPAPI.isp)"
