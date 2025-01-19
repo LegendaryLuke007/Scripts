@@ -6,16 +6,24 @@ $user_response = Read-Host "`nHello! This is the Windows 10 to Windows 11 Migrat
 if ($user_response -eq "y") {
     Write-Host "`nOk Cool! Let me check to see if you have the necessary requirements to upgrade to Windows 11."
     
-    $regInfo = Get-ItemProperty "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion"
+    $ComputerInfo = Get-ComputerInfo
     
-    if ($regInfo.ProductName -like "Windows 11") 
+    <#if ($ComputerInfo.WindowsVersion -ge "22000") 
     {
         Write-Host "`nYou are currently running Windows 11. There is no need to upgrade. Have a great day!"
         exit 0
+    }#>
+    if ($ComputerInfo.WindowsVersion -ge "22000") 
+    
+    {
+    Write-Host "`nYou are currently running Windows 11 ($($ComputerInfo.WindowsProductName))" -ForegroundColor Green
+    Write-Host "Build Number: $($ComputerInfo.WindowsVersion)"
+    Write-Host "There is no need to upgrade. Have a great day!"
+    exit 0
     }
 
     else {
-        Write-Host "`nYou are currently running" $reginfo.ProductName". Would you like to upgrade to Windows 11? (y/n)"
+        Write-Host "`nYou are currently running" $reginfo.ProductName". Would you still like to upgrade to Windows 11? (y/n)"
         $upgrade = Read-Host
         if ($upgrade -eq "y") {
             Write-Host "`nGreat! Checking your hardware requirements now..."
