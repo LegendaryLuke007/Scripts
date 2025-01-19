@@ -43,23 +43,23 @@ function GetIPInfo () { #This function will take an IP address as input, and ret
         [string]$AlienVaultOTX #AlienVault OTX API Key
     )       
 
-    $url_AbuseIPDB = "https://api.abuseipdb.com/api/v2/check"
+    #$url_AbuseIPDB = "https://api.abuseipdb.com/api/v2/check"
     $url_IPAPI = "https://ip-api.com/json/$IP"
-    $url_AlienVaultOTX = "https://otx.alienvault.com/api/v1/indicators/ip/$IP/general"
+    #$url_AlienVaultOTX = "https://otx.alienvault.com/api/v1/indicators/ip/$IP/general"
 
-    $headers_AbuseIPDB = @{ #Create a hashtable for the headers
-        "AbuseIPDB-Key" = $AbuseIDDB #AbuseIPDB API Key
-        "Accept" = "application/json" #Accept header is required for all requests   
+    #$headers_AbuseIPDB = @{ #Create a hashtable for the headers
+        #"AbuseIPDB-Key" = $AbuseIDDB #AbuseIPDB API Key
+        #"Accept" = "application/json" #Accept header is required for all requests   
     }
 
-    $headers_AlienVaultOTX = @{ #Create a hashtable for the headers
-        "X-OTX-API-Key" = $AlienVaultOTX #AlienVault OTX API Key
-        "Accept" = "application/json" #Accept header is required for all requests   
+    #$headers_AlienVaultOTX = @{ #Create a hashtable for the headers
+   #     "X-OTX-API-Key" = $AlienVaultOTX #AlienVault OTX API Key
+   #     "Accept" = "application/json" #Accept header is required for all requests   
     }  
 
-    $response_AbuseIPDB = Invoke-RestMethod -Uri $url_AbuseIPDB -Headers $headers_AbuseIPDB -Method Get
+   # $response_AbuseIPDB = Invoke-RestMethod -Uri $url_AbuseIPDB -Headers $headers_AbuseIPDB -Method Get
     $response_IPAPI = Invoke-RestMethod -Uri $url_IPAPI -Method Get
-    $response_AlienVaultOTX = Invoke-RestMethod -Uri $url_AlienVaultOTX -Headers $headers_AlienVaultOTX -Method Get  
+    #$response_AlienVaultOTX = Invoke-RestMethod -Uri $url_AlienVaultOTX -Headers $headers_AlienVaultOTX -Method Get  
 }
 
 
@@ -72,17 +72,17 @@ $IP = Read-Host #
 echo "Thank you! We will now begin the background check on $IP"
 
 #Call the GetIPInfo function with the IP address and API keys from the config.json file 
-GetIPInfo -IP $IP -AbuseIDDB $config.AbuseIDDB -IPAPI $config.IPAPI -AlienVaultOTX $config.AlienVaultOTX 
+GetIPInfo -IP $IP  
 
 #Display the information in a nice and readable format
-Write-Host "`nResults from AbuseIPDB:"
-Write-Host "------------------------"
-Write-Host "Abuse Confidence Score: $($response_AbuseIPDB.data.abuseConfidenceScore)%"
-Write-Host "Total Reports: $($response_AbuseIPDB.data.totalReports)"
-Write-Host "Country: $($response_AbuseIPDB.data.countryName)"
-Write-Host "ISP: $($response_AbuseIPDB.data.isp)"
-Write-Host "Domain: $($response_AbuseIPDB.data.domain)"
-Write-Host "Last Reported: $($response_AbuseIPDB.data.lastReportedAt)"
+#Write-Host "`nResults from AbuseIPDB:"
+#Write-Host "------------------------"
+#Write-Host "Abuse Confidence Score: $($response_AbuseIPDB.data.abuseConfidenceScore)%"
+#Write-Host "Total Reports: $($response_AbuseIPDB.data.totalReports)"
+#Write-Host "Country: $($response_AbuseIPDB.data.countryName)"
+#Write-Host "ISP: $($response_AbuseIPDB.data.isp)"
+#Write-Host "Domain: $($response_AbuseIPDB.data.domain)"
+#Write-Host "Last Reported: $($response_AbuseIPDB.data.lastReportedAt)"
 
 Write-Host "`nResults from IP-API:" 
 Write-Host "-------------------"
@@ -93,15 +93,15 @@ Write-Host "ISP: $($response_IPAPI.isp)"
 Write-Host "Organization: $($response_IPAPI.org)"
 Write-Host "AS: $($response_IPAPI.as)"
 
-Write-Host "`nResults from AlienVault OTX:"
-Write-Host "--------------------------"
-Write-Host "Reputation: $($response_AlienVaultOTX.reputation)"
-Write-Host "Number of Pulses: $($response_AlienVaultOTX.pulse_info.count)"
-Write-Host "First Seen: $($response_AlienVaultOTX.first_seen)"
-Write-Host "Last Seen: $($response_AlienVaultOTX.last_seen)"
-Write-Host "Country: $($response_AlienVaultOTX.country_name)"
-Write-Host "City: $($response_AlienVaultOTX.city)"
-Write-Host "`n"
+#Write-Host "`nResults from AlienVault OTX:"
+#Write-Host "--------------------------"
+#Write-Host "Reputation: $($response_AlienVaultOTX.reputation)"
+#Write-Host "Number of Pulses: $($response_AlienVaultOTX.pulse_info.count)"
+#Write-Host "First Seen: $($response_AlienVaultOTX.first_seen)"
+#Write-Host "Last Seen: $($response_AlienVaultOTX.last_seen)"
+#Write-Host "Country: $($response_AlienVaultOTX.country_name)"
+#Write-Host "City: $($response_AlienVaultOTX.city)"
+#Write-Host "`n"
 
 
 Write-Host "Would you like to check another IP? (y/n)"
