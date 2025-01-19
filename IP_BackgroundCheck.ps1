@@ -14,7 +14,8 @@
 
 
 try {
-    $config = Get-Content -Path "config.json" | ConvertFrom-Json    
+    $config = Get-Content -Path "config.json" | ConvertFrom-Json    #Loads the config.json file and converts it to a hashtable
+
 }
 
 catch { #If the config.json file is not found, prompt the user to create one
@@ -26,9 +27,9 @@ catch { #If the config.json file is not found, prompt the user to create one
 function Get-APIKey
 {
     return @{ #Return a hashtable with the API keys for each source 
-        AlienVault = $env:ALIENVAULT_API_KEY 
-        AbuseIPDB = $env:ABUSEIPDB_API_KEY 
-        IPAPI = $env:IP_API_KEY 
+        AlienVault = $config.AlienVault 
+        AbuseIPDB = $config.AbuseIPDB 
+        IPAPI = $config.IP_API 
     }
 }
 
@@ -46,16 +47,24 @@ function GetIPInfo () { #This function will take an IP address as input, and ret
     $url_IPAPI = "https://ip-api.com/json/$IP"
     $url_AlienVaultOTX = "https://otx.alienvault.com/api/v1/indicators/ip/$IP/general"
 
-    $header = @{ #Create a hashtable for the headers
+    $headers_AbuseIPDB = @{ #Create a hashtable for the headers
         "AbuseIPDB-Key" = $AbuseIDDB #AbuseIPDB API Key
+        "Accept" = "application/json" #Accept header is required for all requests   
+    }
+
+    $headers_IPAPI = @{ #Create a hashtable for the headers
         "IP-API-Key" = $IPAPI #IP-API API Key
+        "Accept" = "application/json" #Accept header is required for all requests   
+    }
+
+    $headers_AlienVaultOTX = @{ #Create a hashtable for the headers
         "X-OTX-API-Key" = $AlienVaultOTX #AlienVault OTX API Key
         "Accept" = "application/json" #Accept header is required for all requests   
     }  
 
-    $response_AbuseIPDB = Invoke-RestMethod -Uri $url_AbuseIPDB -Headers $header -Method Get
-    $response_IPAPI = Invoke-RestMethod -Uri $url_IPAPI -Headers $header -Method Get
-    $response_AlienVaultOTX = Invoke-RestMethod -Uri $url_AlienVaultOTX -Headers $header -Method Get  
+    $response_AbuseIPDB = Invoke-RestMethod -Uri $url_AbuseIPDB -Headers $headers_AbuseIPDB -Method Get
+    $response_IPAPI = Invoke-RestMethod -Uri $url_IPAPI -Headers $headers_IPAPI -Method Get
+    $response_AlienVaultOTX = Invoke-RestMethod -Uri $url_AlienVaultOTX -Headers $headers_AlienVaultOTX -Method Get  
 }
 
 
