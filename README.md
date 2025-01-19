@@ -9,4 +9,5 @@
 - AppUpdateCheck.ps1
   - User-friendly script for checking updates on Windows Machine for Applications.
 - IP_BackgroundCheck.ps1
-  - Security focused script for finding background info on a IP address while Threat Hunting     
+  - Security focused script for finding background info on a IP address while Threat Hunting
+  - config.template.json is a part of it as well
