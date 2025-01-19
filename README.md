@@ -7,7 +7,7 @@
 ---
 ## List of Scripts and Summary:
 - AppUpdateCheck.ps1
-  - User-friendly script for checking updates on Windows Machine for Applications.
+  - Script used for checking if there are updates needed for local applications on a Windows Machine
 - IP_BackgroundCheck.ps1
   - Security focused script for finding background info on a IP address while Threat Hunting
 - Windows11Migration.ps1
