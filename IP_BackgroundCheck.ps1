@@ -44,35 +44,37 @@ function GetIPInfo () { #This function will take an IP address as input, and ret
     )       
 
     #$url_AbuseIPDB = "https://api.abuseipdb.com/api/v2/check"
-    $url_IPAPI = "https://ip-api.com/json/$IP"
+    $url_IPAPI = "http://ip-api.com/json/$IP" #IP-API URL needs to be HTTP to be the free tier
     #$url_AlienVaultOTX = "https://otx.alienvault.com/api/v1/indicators/ip/$IP/general"
 
     #$headers_AbuseIPDB = @{ #Create a hashtable for the headers
         #"AbuseIPDB-Key" = $AbuseIDDB #AbuseIPDB API Key
         #"Accept" = "application/json" #Accept header is required for all requests   
-    }
+   # }
 
     #$headers_AlienVaultOTX = @{ #Create a hashtable for the headers
    #     "X-OTX-API-Key" = $AlienVaultOTX #AlienVault OTX API Key
    #     "Accept" = "application/json" #Accept header is required for all requests   
-    }  
+    #}  
 
    # $response_AbuseIPDB = Invoke-RestMethod -Uri $url_AbuseIPDB -Headers $headers_AbuseIPDB -Method Get
     $response_IPAPI = Invoke-RestMethod -Uri $url_IPAPI -Method Get
     #$response_AlienVaultOTX = Invoke-RestMethod -Uri $url_AlienVaultOTX -Headers $headers_AlienVaultOTX -Method Get  
+
+    return $response_IPAPI
 }
 
 
 #Main Loop 
 while ($true -eq 1)
 {
-echo "Hello! Please enter an IP address to begin the background check."
+Write-Host "Hello! Please enter an IP address to begin the background check."
 $IP = Read-Host #
 
-echo "Thank you! We will now begin the background check on $IP"
+Write-Host "Thank you! We will now begin the background check on $IP"
 
 #Call the GetIPInfo function with the IP address and API keys from the config.json file 
-GetIPInfo -IP $IP  
+$response_IPAPI = GetIPInfo -IP $IP  
 
 #Display the information in a nice and readable format
 #Write-Host "`nResults from AbuseIPDB:"
