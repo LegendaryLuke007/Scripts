@@ -47,7 +47,7 @@ while ($gogotag -eq "yes") #Loop runs continuously as long as the user isn"t fin
         }
     }
     
-    if ($Checkout -eq "") #If the user doesn"t upgrade anything then it should come here
+    if ($Checkout -eq "") #If the user doesn't upgrade anything then it should come here
       {
       $Checkout = Read-Host "OK!, $ApplicationName Should be upgraded, do you need to upgrade something else?"
       }
