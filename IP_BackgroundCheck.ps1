@@ -52,18 +52,13 @@ function GetIPInfo () { #This function will take an IP address as input, and ret
         "Accept" = "application/json" #Accept header is required for all requests   
     }
 
-    $headers_IPAPI = @{ #Create a hashtable for the headers
-        "IP-API-Key" = $IPAPI #IP-API API Key
-        "Accept" = "application/json" #Accept header is required for all requests   
-    }
-
     $headers_AlienVaultOTX = @{ #Create a hashtable for the headers
         "X-OTX-API-Key" = $AlienVaultOTX #AlienVault OTX API Key
         "Accept" = "application/json" #Accept header is required for all requests   
     }  
 
     $response_AbuseIPDB = Invoke-RestMethod -Uri $url_AbuseIPDB -Headers $headers_AbuseIPDB -Method Get
-    $response_IPAPI = Invoke-RestMethod -Uri $url_IPAPI -Headers $headers_IPAPI -Method Get
+    $response_IPAPI = Invoke-RestMethod -Uri $url_IPAPI -Method Get
     $response_AlienVaultOTX = Invoke-RestMethod -Uri $url_AlienVaultOTX -Headers $headers_AlienVaultOTX -Method Get  
 }
 
@@ -109,7 +104,7 @@ Write-Host "City: $($response_AlienVaultOTX.city)"
 Write-Host "`n"
 
 
-echo "Would you like to check another IP? (y/n)"
+Write-Host "Would you like to check another IP? (y/n)"
 $Continue = Read-Host
 
 
