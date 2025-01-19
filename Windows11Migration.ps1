@@ -1,23 +1,27 @@
 # This script is for migrating Windows 10 to Windows 11. It will check if the user has the necessary requirements to upgrade to Windows 11, and if so, it will upgrade the user to Windows 11.
 # THis will involve also checking if the user has the necessary hardware requirements to upgrade to Windows 11.
 
-$user_response = Read-Host "Hello! This is the Windows 10 to Windows 11 Migration Script. Are you trying to upgrade to Windows 11? (y/n)"
+$user_response = Read-Host "`nHello! This is the Windows 10 to Windows 11 Migration Script. Are you trying to upgrade to Windows 11? (y/n)"
 
 if ($user_response -eq "y") {
-    Write-Host "Ok Cool! Let me check to see if you have the necessary requirements to upgrade to Windows 11."
+    Write-Host "`nOk Cool! Let me check to see if you have the necessary requirements to upgrade to Windows 11."
     
-    $windows_version = Get-WmiObject -Class Win32_OperatingSystem | Select-Object -ExpandProperty Version
+    $windows_version = Get-WmiObject -Class Win32_OperatingSystem | Select-Object -WindowsProductName
     if ($windows_version -like "11.*") 
     {
-        Write-Host "You are currently running Windows 11. There is no need to upgrade. Have a great day!"
+        Write-Host "`nYou are currently running Windows 11. There is no need to upgrade. Have a great day!"
         exit 0
     }
 
     else {
-        Write-Host "You are currently running Windows $windows_version. Would you like to upgrade to Windows 11? (y/n)"
+        Write-Host "`nYou are currently running Windows $windows_version. Would you like to upgrade to Windows 11? (y/n)"
         $upgrade = Read-Host
         if ($upgrade -eq "y") {
-            Write-Host "Great! Checking your hardware requirements now..."
+            Write-Host "`nGreat! Checking your hardware requirements now..."
+        }
+        else {
+            Write-Host "`nThank you for using the Windows 10 to Windows 11 Migration Script. Have a great day!"
+            exit 0  
         }
     }
 
@@ -61,7 +65,18 @@ if ($user_response -eq "y") {
         }
     }
 
+    #Display the results
+    Write-Host "`n  Results:"
+    foreach ($requirement in $requirements) {
+        Write-Host "$($requirement.Key): $($requirement.Value.Current) ($($requirement.Value.Status))"
+    }
+
+
+
+
+
+}
 else {
-    Write-Host "Thank you for using the Windows 10 to Windows 11 Migration Script. Have a great day!"
+    Write-Host "`nThank you for using the Windows 10 to Windows 11 Migration Script. Have a great day!"
     exit 0
 }
