@@ -10,11 +10,8 @@ if ($user_response -eq "y") {
     $buildnumber = [System.Environment]::OSVersion.Version.Build
     $ComputerInfo = Get-ComputerInfo
     
-    <#if ($ComputerInfo.WindowsVersion -ge "22000") 
-    {
-        Write-Host "`nYou are currently running Windows 11. There is no need to upgrade. Have a great day!"
-        exit 0
-    }#>
+
+
     if ($buildnumber -ge 22000) 
     
     {
@@ -28,20 +25,31 @@ if ($user_response -eq "y") {
     else {
         Write-Host "`nYou are currently running" $reginfo.ProductName". Would you still like to upgrade to Windows 11? (y/n)"
         $upgrade = Read-Host
+
         if ($upgrade -eq "y") {
+            
+            $admin_credentials = Get-Credential -Message "Enter admin credentials" #Securely gets the admin credentials from the user.
+        
+            
             Write-Host "`nGreat! Checking your hardware requirements now..."
         }
+
         else {
             Write-Host "`nThank you for using the Windows 10 to Windows 11 Migration Script. Have a great day!"
             exit 0  
         }
     }
 
+
+    Start-Process Powershell -Credential $admin_credentials -ArgumentList "-Command 
+    {$SecureBootStatus = Confirm-SecureBootUEFI }"
+
+    Start-Process Powershell -Credential $admin_credentials -ArgumentList "-Command 
+    {$tpm = Get-Tpm}"
+
     $processor = Get-WmiObject -Class Win32_Processor
-    $tpm = Get-Tpm
     $ram = Get-WmiObject -Class Win32_ComputerSystem
     $disk = Get-WmiObject -Class Win32_LogicalDisk -Filter "DeviceID='C:'"
-    $secureBootStatus = Confirm-SecureBootUEFI
     
     # Check Requirements
     $requirements = @{
