@@ -6,6 +6,8 @@ $user_response = Read-Host "`nHello! This is the Windows 10 to Windows 11 Migrat
 if ($user_response -eq "y") {
     Write-Host "`nOk Cool! Let me check to see if you have the necessary requirements to upgrade to Windows 11."
     
+    $osinfo = Get-WmiObject -Class Win32_OperatingSystem   
+    $buildnumber = [System.Environment]::OSVersion.Version.Build
     $ComputerInfo = Get-ComputerInfo
     
     <#if ($ComputerInfo.WindowsVersion -ge "22000") 
@@ -13,12 +15,13 @@ if ($user_response -eq "y") {
         Write-Host "`nYou are currently running Windows 11. There is no need to upgrade. Have a great day!"
         exit 0
     }#>
-    if ($ComputerInfo.WindowsVersion -ge "22000") 
+    if ($buildnumber -ge 22000) 
     
     {
-    Write-Host "`nYou are currently running Windows 11 ($($ComputerInfo.WindowsProductName))" -ForegroundColor Green
-    Write-Host "Build Number: $($ComputerInfo.WindowsVersion)"
+    Write-Host "`nYou are currently running Windows 11"
+    Write-Host "Build Number: $buildnumber"
     Write-Host "There is no need to upgrade. Have a great day!"
+    
     exit 0
     }
 
