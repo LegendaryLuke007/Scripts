@@ -21,7 +21,7 @@ if ($user_response -eq "y") {
     Write-Host "`nYou are currently running Windows 11"
     Write-Host "Build Number: $buildnumber"
     Write-Host "There is no need to upgrade. Have a great day!"
-    
+
     exit 0
     }
 
@@ -84,11 +84,18 @@ if ($user_response -eq "y") {
     }
 
 
+    if ($requirements.Values.Status -eq $false) {
+        Write-Host "`nYou do not meet the requirements to upgrade to Windows 11."
+        
+        $requirements.GetEnumerator() | Where-Object {$_.Value.Status -eq $false} | ForEach-Object {
+            Write-Host "❌ Failed: $($_.Key)" -ForegroundColor Red
+        }       
+        exit 1 
+    }
 
-
-
+    else {
+        Write-Host "`nThank you for using the Windows 10 to Windows 11 Migration Script. Have a great day!"
+        exit 0
+    }
 }
-else {
-    Write-Host "`nThank you for using the Windows 10 to Windows 11 Migration Script. Have a great day!"
-    exit 0
-}
+
