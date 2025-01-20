@@ -1,6 +1,6 @@
 # This script is for migrating Windows 10 to Windows 11. It will check if the user has the necessary requirements to upgrade to Windows 11, and if so, it will upgrade the user to Windows 11.
 # THis will involve also checking if the user has the necessary hardware requirements to upgrade to Windows 11.
-# NOTE: Must run script as admin.
+# NOTE: Must run script as admin. There will be an error message if the user is not a admin.
 
 $user_response = Read-Host "`nHello! This is the Windows 10 to Windows 11 Migration Script. Are you trying to upgrade to Windows 11? (y/n)"
 
@@ -44,18 +44,41 @@ if ($user_response -eq "y") {
     # First, check if we're already running as admin
     if (-NOT ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
         Write-Host "`nThis script requires administrator privileges." -ForegroundColor Red
+        Write-Host "`nPlease run the script as an admin." -ForegroundColor Red
         Start-Process PowerShell -Verb RunAs -ArgumentList "-File `"$($MyInvocation.MyCommand.Path)`""
-        exit
+        exit 0
     }
 
     try { #These two commands require admin privileges, if they don't work, the script will exit.
         $SecureBootStatus = Confirm-SecureBootUEFI
         $tpm = Get-Tpm
 
-    }
+        $tpmVersion = if ($tpm) {
+        if ($tpm.TpmPresent) {
+            if ($tpm.PhysicalPresenceVersionInfo -match "^2\.0|^2") 
+            {
+                "2.0"
+            } 
+            
+            else {
+                $tpm.ManufacturerVersion
+            }
+        } 
 
+        else {
+            "Not Present"
+        }
+    } 
+    
+    else {
+        "Not Found"
+    }
+    
+    } 
     catch {
         Write-Host "`nAn error occurred while checking the Secure Boot status or TPM." -ForegroundColor Red
+        $tpmVersion = "Error checking TPM"
+        $tpmStatus = $false
         exit 1
     }
 
@@ -87,8 +110,8 @@ if ($user_response -eq "y") {
         }
         "TPM Version" = @{
             Required = "TPM 2.0"
-            Current = if ($tpm) { $tpm.TpmVersion } else { "Not Found" }
-            Status = if ($tpm) { $tpm.TpmVersion -ge 2.0 } else { $false }
+            Current = $tpmVersion   <#if ($tpm) { $tpm.TpmVersion } else { "Not Found" } #>
+            Status = if ($tpm) { $tpm.PhysicalPresenceVersionInfo -ge 2.0 } else { $false } 
         }
         "Secure Boot" = @{
             Required = "Enabled"
@@ -113,9 +136,10 @@ if ($user_response -eq "y") {
         exit 1 
     }
 
+}
     else {
         Write-Host "`nThank you for using the Windows 10 to Windows 11 Migration Script. Have a great day!"
         exit 0
     }
-}
+
 
