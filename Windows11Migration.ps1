@@ -1,5 +1,6 @@
 # This script is for migrating Windows 10 to Windows 11. It will check if the user has the necessary requirements to upgrade to Windows 11, and if so, it will upgrade the user to Windows 11.
 # THis will involve also checking if the user has the necessary hardware requirements to upgrade to Windows 11.
+# NOTE: Must run script as admin.
 
 $user_response = Read-Host "`nHello! This is the Windows 10 to Windows 11 Migration Script. Are you trying to upgrade to Windows 11? (y/n)"
 
@@ -11,6 +12,7 @@ if ($user_response -eq "y") {
     $ComputerInfo = Get-ComputerInfo
     
 
+    <# Bypassing the build number check so that I can run the script on a Windows 11 machine.
 
     if ($buildnumber -ge 22000) 
     
@@ -22,14 +24,13 @@ if ($user_response -eq "y") {
     exit 0
     }
 
-    else {
+    #>
+
+    <# else { #>
         Write-Host "`nYou are currently running" $reginfo.ProductName". Would you still like to upgrade to Windows 11? (y/n)"
         $upgrade = Read-Host
 
-        if ($upgrade -eq "y") {
-            
-            $admin_credentials = Get-Credential -Message "Enter admin credentials" #Securely gets the admin credentials from the user.
-        
+        if ($upgrade -eq "y") {        
             
             Write-Host "`nGreat! Checking your hardware requirements now..."
         }
@@ -38,14 +39,25 @@ if ($user_response -eq "y") {
             Write-Host "`nThank you for using the Windows 10 to Windows 11 Migration Script. Have a great day!"
             exit 0  
         }
+    <#} #>
+
+    # First, check if we're already running as admin
+    if (-NOT ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
+        Write-Host "`nThis script requires administrator privileges." -ForegroundColor Red
+        Start-Process PowerShell -Verb RunAs -ArgumentList "-File `"$($MyInvocation.MyCommand.Path)`""
+        exit
     }
 
+    try { #These two commands require admin privileges, if they don't work, the script will exit.
+        $SecureBootStatus = Confirm-SecureBootUEFI
+        $tpm = Get-Tpm
 
-    Start-Process Powershell -Credential $admin_credentials -ArgumentList "-Command 
-    {$SecureBootStatus = Confirm-SecureBootUEFI }"
+    }
 
-    Start-Process Powershell -Credential $admin_credentials -ArgumentList "-Command 
-    {$tpm = Get-Tpm}"
+    catch {
+        Write-Host "`nAn error occurred while checking the Secure Boot status or TPM." -ForegroundColor Red
+        exit 1
+    }
 
     $processor = Get-WmiObject -Class Win32_Processor
     $ram = Get-WmiObject -Class Win32_ComputerSystem
@@ -87,7 +99,7 @@ if ($user_response -eq "y") {
 
     #Display the results
     Write-Host "`n  Results:"
-    foreach ($requirement in $requirements) {
+    foreach ($requirement in $requirements.GetEnumerator()) {
         Write-Host "$($requirement.Key): $($requirement.Value.Current) ($($requirement.Value.Status))"
     }
 
