@@ -14,7 +14,7 @@ function GetIPInfo () { #This function will take an IP address as input, and ret
     param (
         [parameter(Mandatory = $true)] #IP is a required parameter
         [string]$IP, #               
-        [string]$IPAPI, #IP-API API Key
+        [string]$IPAPI #IP-API API Key
     )       
 
     $url_IPAPI = "http://ip-api.com/json/$IP" #IP-API URL needs to be HTTP to be the free tier
