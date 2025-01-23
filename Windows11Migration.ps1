@@ -55,33 +55,30 @@ if ($user_response -eq "y") {
         $SecureBootStatus = Confirm-SecureBootUEFI
         $tpm = Get-Tpm
 
-        $tpmVersion = if ($tpm) {
-        if ($tpm.TpmPresent) {
-            if ($tpm.PhysicalPresenceVersionInfo -match "^2\.0|^2") 
-            {
-                "2.0"
-            } 
-            
-            else {
-                $tpm.PhysicalPresenceVersionInfo
+        # More reliable TPM version check
+        $tpmVersion = if ($tpm.TpmPresent) {
+            # Get detailed TPM info
+            $tpmInfo = Get-WmiObject -Namespace "root\CIMV2\Security\MicrosoftTpm" -Class Win32_Tpm
+            if ($tpmInfo) {
+                # Check both PhysicalPresenceVersionInfo and SpecVersion
+                $specVersion = $tpmInfo.SpecVersion
+                if ($specVersion -match "2.0" -or $tpmInfo.PhysicalPresenceVersionInfo -match "2.0") {
+                    "2.0"
+                } else {
+                    $specVersion
+                }
+            } else {
+                "Unknown Version"
             }
-        } 
-
-        else {
+        } else {
             "Not Present"
         }
-    } 
-    
-    else {
-        "Not Found"
-    }
-    
+        $tpmStatus = ($tpmVersion -eq "2.0")
     } 
     catch {
-        Write-Host "`nAn error occurred while checking the Secure Boot status or TPM." -ForegroundColor Red
+        Write-Host "`nAn error occurred while checking TPM status: $($_.Exception.Message)" -ForegroundColor Red
         $tpmVersion = "Error checking TPM"
         $tpmStatus = $false
-        exit 1
     }
 
     $processor = Get-WmiObject -Class Win32_Processor
@@ -112,8 +109,8 @@ if ($user_response -eq "y") {
         }
         "TPM Version" = @{
             Required = "TPM 2.0"
-            Current = if ($tpm) { $tpm.TpmVersion } else { "Not Found" } 
-            Status = if ($tpm) { $tpm.PhysicalPresenceVersionInfo -ge 2.0 } else { $false } 
+            Current = $tpmVersion
+            Status = $tpmStatus
         }
         "Secure Boot" = @{
             Required = "Enabled"
@@ -123,25 +120,12 @@ if ($user_response -eq "y") {
     }
 
     #Display the results
-    Write-Host "`n  Results:"
+    Write-Host "`nResults:"
     foreach ($requirement in $requirements.GetEnumerator()) {
         Write-Host "$($requirement.Key): $($requirement.Value.Current) ($($requirement.Value.Status))"
     }
 
-
-    if ($requirements.Value.Status -eq $false) {
-        Write-Host "`nYou do not meet the requirements to upgrade to Windows 11."
-        
-        $requirements.GetEnumerator() | Where-Object {$_.Value.Status -eq $false} | ForEach-Object {
-            Write-Host "❌ Failed: $($_.Key)" -ForegroundColor Red
-        }       
-        exit 1 
-    }
-
+    Write-Host "`nThank you for using the Windows 10 to Windows 11 Migration Script. Have a great day!`n"
+   
 }
-    else {
-        Write-Host "`nThank you for using the Windows 10 to Windows 11 Migration Script. Have a great day!"
-        exit 0
-    }
-
 
