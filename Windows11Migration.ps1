@@ -7,11 +7,19 @@ $user_response = Read-Host "`nHello! This is the Windows 10 to Windows 11 Migrat
 if ($user_response -eq "y") {
     Write-Host "`nOk Cool! Let me check to see if you have the necessary requirements to upgrade to Windows 11."
     
+    $currentIdentity = [Security.Principal.WindowsIdentity]::GetCurrent()
+    $currentPrincipal = New-Object Security.Principal.WindowsPrincipal($currentIdentity)
+    $isAdmin = $currentPrincipal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
+    if (-not $isAdmin)
+    {
+        Write-Host "`nThis script requires administrator privileges." -ForegroundColor Red
+        Write-Host "`nPlease run the script as an admin." -ForegroundColor Red
+        exit 0
+    }
+
     $osinfo = Get-WmiObject -Class Win32_OperatingSystem   
     $buildnumber = [System.Environment]::OSVersion.Version.Build
-    $ComputerInfo = Get-ComputerInfo
-    
-
+    $ComputerInfo = (Get-ComputerInfo).WindowsProductName
     <# Bypassing the build number check so that I can run the script on a Windows 11 machine.
 
     if ($buildnumber -ge 22000) 
@@ -27,7 +35,7 @@ if ($user_response -eq "y") {
     #>
 
     <# else { #>
-        Write-Host "`nYou are currently running" $reginfo.ProductName". Would you still like to upgrade to Windows 11? (y/n)"
+        Write-Host "`nYou are currently running" $ComputerInfo.ProductName". Would you still like to upgrade to Windows 11? (y/n)"
         $upgrade = Read-Host
 
         if ($upgrade -eq "y") {        
@@ -36,18 +44,12 @@ if ($user_response -eq "y") {
         }
 
         else {
-            Write-Host "`nThank you for using the Windows 10 to Windows 11 Migration Script. Have a great day!"
+            Write-Host "`nThank you for using the Windows 10 to Windows 11 Migration Script. Have a great day!" 
             exit 0  
         }
     <#} #>
-
+ 
     # First, check if we're already running as admin
-    if (-NOT ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
-        Write-Host "`nThis script requires administrator privileges." -ForegroundColor Red
-        Write-Host "`nPlease run the script as an admin." -ForegroundColor Red
-        Start-Process PowerShell -Verb RunAs -ArgumentList "-File `"$($MyInvocation.MyCommand.Path)`""
-        exit 0
-    }
 
     try { #These two commands require admin privileges, if they don't work, the script will exit.
         $SecureBootStatus = Confirm-SecureBootUEFI
@@ -61,7 +63,7 @@ if ($user_response -eq "y") {
             } 
             
             else {
-                $tpm.ManufacturerVersion
+                $tpm.PhysicalPresenceVersionInfo
             }
         } 
 
@@ -110,7 +112,7 @@ if ($user_response -eq "y") {
         }
         "TPM Version" = @{
             Required = "TPM 2.0"
-            Current = $tpmVersion   <#if ($tpm) { $tpm.TpmVersion } else { "Not Found" } #>
+            Current = if ($tpm) { $tpm.TpmVersion } else { "Not Found" } 
             Status = if ($tpm) { $tpm.PhysicalPresenceVersionInfo -ge 2.0 } else { $false } 
         }
         "Secure Boot" = @{
@@ -127,7 +129,7 @@ if ($user_response -eq "y") {
     }
 
 
-    if ($requirements.Values.Status -eq $false) {
+    if ($requirements.Value.Status -eq $false) {
         Write-Host "`nYou do not meet the requirements to upgrade to Windows 11."
         
         $requirements.GetEnumerator() | Where-Object {$_.Value.Status -eq $false} | ForEach-Object {
