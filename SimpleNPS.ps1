@@ -21,6 +21,7 @@ function Display-OpenPorts {
     Write-Host "Scan complete. Here are the open ports:"
 }
 #>
+Write-Host "Listening"
 Get-NetTCPConnection | #This will show all the listening connections on the machine.
     Where-Object State -eq "Listen" | 
     Select-Object @{Name="Port";Expression={$_.LocalPort}},
@@ -31,6 +32,7 @@ Get-NetTCPConnection | #This will show all the listening connections on the mach
     Sort-Object Port |
     Format-Table -AutoSize
 
+Write-Host "Established"
 Get-NetTCPConnection | #This will show all the established connections on the machine.
     Where-Object State -eq "Established" | 
     Select-Object @{Name="Port";Expression={$_.LocalPort}},
@@ -47,6 +49,7 @@ Get-NetTCPConnection | #This will show all the established connections on the ma
     Sort-Object Port |
     Format-Table -AutoSize
 
+Write-Host "SynSent"
 Get-NetTCPConnection | #This will show all the established connections on the machine.
     Where-Object State -eq "SynSent" | 
     Select-Object @{Name="Port";Expression={$_.LocalPort}},
@@ -63,4 +66,20 @@ Get-NetTCPConnection | #This will show all the established connections on the ma
     Sort-Object Port |
     Format-Table -AutoSize
 
+Write-Host "SynReceived"
+Get-NetTCPConnection | #This will show all the established connections on the machine.
+    Where-Object State -eq "SynReceived" | 
+    Select-Object @{Name="Port";Expression={$_.LocalPort}},
+                  @{Name="Service";Expression={(Get-Process -Id $_.OwningProcess).ProcessName}},
+                  LocalAddress,
+                  LocalPort,
+                  RemoteAddress,
+                  RemotePort,
+                  State,
+                  OwningProcess,
+                  CreationTime,
+                  OffloadState,
+                  AppliedSetting |   
+    Sort-Object Port |
+    Format-Table -AutoSize
 
