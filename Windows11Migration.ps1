@@ -1,6 +1,15 @@
 # This script is for migrating Windows 10 to Windows 11. It will check if the user has the necessary requirements to upgrade to Windows 11, and if so, it will upgrade the user to Windows 11.
 # THis will involve also checking if the user has the necessary hardware requirements to upgrade to Windows 11.
-# NOTE: Must run script as admin. There will be an error message if the user is not a admin.
+# 
+# NOTES BEFORE RUNNING THE SCRIPT: 
+# - Must run script as admin. There will be an error message if the user is not a admin.
+# - Must have the $IsoPath variable set to the path of the local ISO image.
+# - This script will run the FULL Windows 11 Upgrade process without need of user input once hardware requirements are met. 
+# - This script will also check if the user has the necessary requirements to upgrade to Windows 11.
+
+
+
+$isoPath = "MUST HAVE ISO PATH HERE"
 
 $user_response = Read-Host "`nHello! This is the Windows 10 to Windows 11 Migration Script. Are you trying to upgrade to Windows 11? (y/n)"
 
@@ -20,6 +29,7 @@ if ($user_response -eq "y") {
     $osinfo = Get-WmiObject -Class Win32_OperatingSystem   
     $buildnumber = [System.Environment]::OSVersion.Version.Build
     $ComputerInfo = (Get-ComputerInfo).WindowsProductName
+    Add-Type -AssemblyName System.Windows.Forms # This is to get the screen resolution
     <# Bypassing the build number check so that I can run the script on a Windows 11 machine.
 
     if ($buildnumber -ge 22000) 
@@ -97,6 +107,11 @@ if ($user_response -eq "y") {
             Current = "$($processor.MaxClockSpeed) MHz"
             Status = $processor.MaxClockSpeed -ge 1000
         }
+        "Processor Architecture" = @{
+            Required = "64-bit processor"
+            Current = $env:PROCESSOR_ARCHITECTURE
+            Status = $env:PROCESSOR_ARCHITECTURE -eq "AMD64"
+        }
         "RAM" = @{
             Required = "4 GB or more"
             Current = "$([math]::Round($ram.TotalPhysicalMemory/1GB, 2)) GB"
@@ -117,6 +132,21 @@ if ($user_response -eq "y") {
             Current = if ($null -ne $secureBootStatus) { "Enabled" } else { "Disabled" }
             Status = $null -ne $secureBootStatus
         }
+        "Boot Method" = @{
+            Required = "UEFI"
+            Current = if ($diskPartitioning.PartitionStyle -eq "GPT") { "UEFI" } else { "Legacy BIOS" }
+            Status = $diskPartitioning.PartitionStyle -eq "GPT"
+        }
+        "DirectX" = @{
+            Required = "DirectX 12 compatible"
+            Current = "Checking requires DXDIAG"
+            Status = $null  # Would need to parse dxdiag output
+        }
+        "Display" = @{
+            Required = "720p (1280x720)"
+            Current = "$([System.Windows.Forms.Screen]::PrimaryScreen.Bounds.Width)x$([System.Windows.Forms.Screen]::PrimaryScreen.Bounds.Height)"
+            Status = ([System.Windows.Forms.Screen]::PrimaryScreen.Bounds.Width -ge 1280) -and ([System.Windows.Forms.Screen]::PrimaryScreen.Bounds.Height -ge 720)
+        }
     }
 
     #Display the results
@@ -125,7 +155,27 @@ if ($user_response -eq "y") {
         Write-Host "$($requirement.Key): $($requirement.Value.Current) ($($requirement.Value.Status))"
     }
 
-    Write-Host "`nThank you for using the Windows 10 to Windows 11 Migration Script. Have a great day!`n"
-   
+    Write-Host "`n OK. Everything seems to be in order. One Last time, would you like to upgrade to Windows 11? (y/n)   "
+    $upgrade = Read-Host
+
+    if ($upgrade -eq "y") {
+        Write-Host "`nGreat! Upgrading to Windows 11 now..."
+    }
+    else {
+        Write-Host "`nThank you for using the Windows 10 to Windows 11 Migration Script. Have a great day!`n"
+        exit 0
+    }   
+
+    #---------------------------------------------------------------------------------
+    # We are now ready to upgrade to Windows 11. This next section will be using 
+    # A ISO image located in the same folder as the script to do so (for convienence).
+    #----------------------------------------------------------------------------------
+    $ISODrivePath = -ImagePath $isoPath -PassThru
+
+    function Windows11Upgrade {
+
+
+    }
+
 }
 
