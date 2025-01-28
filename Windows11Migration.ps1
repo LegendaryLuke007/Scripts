@@ -173,8 +173,13 @@ if ($user_response -eq "y") {
     $ISODrivePath = -ImagePath $isoPath -PassThru
 
     function Windows11Upgrade {
+        Write-Host "`nMounting the ISO image..."
+        $ISODrivePath = -ImagePath $isoPath -PassThru
 
+        Write-Host "`nRunning the Windows 11 Upgrade..."
+        Start-Process -FilePath "$ISODrivePath\setup.exe" -ArgumentList "/auto" -Wait
 
+        Write-Host "`nWindows 11 Upgrade complete. Have a great day!"   
     }
 
 }
