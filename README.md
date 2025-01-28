@@ -11,7 +11,7 @@
 - SoftwareVulnerabilityScanner.ps1
   - Script used to do a vulnerability check for the Software that is present on said computer.
   - Calls on a API key to compare the version of software with known vulnerabilities and displays threat level based on the data.
-  - This is still a work in progress. I would love to get 3-4 scripts together into an application for Software/Application management from a Security lens.
+  - I would love to get 3-4 scripts together into an application for Software/Application management from a Security lens.
 - IP_BackgroundCheck.ps1
   - Security focused script for finding background info on a IP address while Threat Hunting
 - Windows11Migration.ps1
